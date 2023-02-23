@@ -15,12 +15,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import com.demo.jetpackcomposecrashcourse.datasource.NetworkLayer.apiClient
 import com.demo.jetpackcomposecrashcourse.ui.theme.JetpackcomposecrashcourseTheme
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        GlobalScope.launch {
+            apiClient.getData()
+        }
         setContent {
             JetpackcomposecrashcourseTheme {
                 // A surface container using the 'background' color from the theme
@@ -29,6 +36,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     Greeting("Android")
+
                 }
             }
         }
@@ -52,10 +60,6 @@ fun Greeting(name: String) {
             modifier = Modifier
                 .padding(15.dp,52.dp)
         )
-    }
-    
-    Row(horizontalArrangement = Alignment.Start) {
-        
     }
 
 

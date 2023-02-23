@@ -15,14 +15,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demo.jetpackcomposecrashcourse.datasource.NetworkLayer.apiClient
 import com.demo.jetpackcomposecrashcourse.ui.theme.Blue200
+import com.demo.jetpackcomposecrashcourse.ui.theme.JetpackcomposecrashcourseTheme
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        GlobalScope.launch {
+            apiClient.getData()
+        }
         setContent {
-//TODO: Add Stuff
+            JetpackcomposecrashcourseTheme {
+                MainScreen()
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -15,6 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.demo.jetpackcomposecrashcourse.datasource.NetworkLayer.apiClient
 import com.demo.jetpackcomposecrashcourse.ui.theme.Blue200
 import com.demo.jetpackcomposecrashcourse.ui.theme.JetpackcomposecrashcourseTheme
@@ -38,13 +45,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
+    val navController = rememberNavController()
     Scaffold(
-//        topBar = { TopBar() },
-
-        bottomBar = { BottomNavigationBar() },
+        bottomBar = { BottomNavigationBar(navController) },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
-//                ADD ISH LATER
+                Navigation(navController = navController)
             }
         },
         backgroundColor = colorResource(R.color.white)
@@ -68,7 +74,7 @@ fun TopBar() {
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController: NavController) {
     val pages = listOf(
         NavigationItem.Home,
         NavigationItem.Meds,
@@ -79,6 +85,8 @@ fun BottomNavigationBar() {
         backgroundColor = colorResource(id = R.color.white),
         contentColor = Color.LightGray
     ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
         pages.forEach { page ->
             BottomNavigationItem(
                 icon = {
@@ -90,15 +98,46 @@ fun BottomNavigationBar() {
                         contentDescription = page.title
                     )
                 },
-                label = { Text(text = page.title) },
                 selectedContentColor = Blue200,
                 unselectedContentColor = Color.LightGray,
                 alwaysShowLabel = false,
-                selected = false,
+                selected = currentRoute == page.route,
                 onClick = {
-                    /* Add code later */
+                    navController.navigate(page.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
+                            }
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun Navigation(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
+        composable(NavigationItem.Home.route) {
+            HomeScreen()
+        }
+        composable(NavigationItem.Meds.route) {
+            MedicationScreen()
+        }
+        composable(NavigationItem.Metrics.route) {
+            MetricsScreen()
+        }
+        composable(NavigationItem.UserProfile.route) {
+            UserProfileScreen()
         }
     }
 }

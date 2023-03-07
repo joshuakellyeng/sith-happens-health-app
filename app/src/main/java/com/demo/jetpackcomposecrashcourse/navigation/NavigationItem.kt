@@ -1,4 +1,6 @@
-package com.demo.jetpackcomposecrashcourse
+package com.demo.jetpackcomposecrashcourse.navigation
+
+import com.demo.jetpackcomposecrashcourse.R
 
 sealed class NavigationItem(var route: String, var icon: Int, var title: String){
     object Home : NavigationItem("home", R.drawable.ic_home, "Welcome back!")
